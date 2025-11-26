@@ -422,8 +422,7 @@ Found a bug? Please open an issue with:
 ## 📞 Contact & Support
 
 - **GitHub Issues** - For bug reports and feature requests
-- **Email** - [your-email@example.com](mailto:your-email@example.com)
-- **Twitter** - [@yourusername](https://twitter.com/yourusername)
+- **Email** - [mdshehzad141@gmail.com]
 
 ## 🙏 Acknowledgments
 
