@@ -4,27 +4,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wise Stream Player</title>
+  <title>Wise Stream</title>
   <style>
     body {
       margin: 0;
+      padding: 20px;
       background: #141414;
       color: white;
       font-family: Arial, sans-serif;
       text-align: center;
     }
-    h2 { padding: 20px; }
-    .message { padding: 16px; color: #ccc; }
-    a { color: #e50914; }
+    button {
+      padding: 12px 20px;
+      background: #e50914;
+      color: white;
+      border: 0;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    video {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 20px;
+      background: black;
+    }
+    #status { color: #ccc; }
   </style>
+  <script src="https://accounts.google.com/gsi/client"></script>
 </head>
 <body>
-  <h2>Wise Stream</h2>
-  <p class="message">
-    Pemutar video sedang disiapkan.
-  </p>
-  <p>
-    <a href="index.html">Kembali ke Beranda</a>
-  </p>
+  <h1>Wise Stream</h1>
+  <p id="status">Login Google untuk membuka video.</p>
+  <button id="login">Login & Putar Video</button>
+  <br>
+  <video id="player" controls playsinline></video>
+  <p><a href="index.html" style="color:#e50914">Kembali</a></p>
+
+  <script>
+    const CLIENT_ID = "886297116680-qqbmam7ip62gomiccb3qkqaejabpur28.apps.googleusercontent.com";
+    const VIDEO_ID = "1K67EJHV-HfzbfNp_g6JZ31dVP8OrEcRb";
+
+    const status = document.getElementById("status");
+    const player = document.getElementById("player");
+
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: "https://www.googleapis.com/auth/drive.readonly",
+      callback: async (response) => {
+        if (response.error) {
+          status.textContent = "Login gagal. Periksa konfigurasi Google Cloud.";
+          return;
+        }
+
+        status.textContent = "Memuat video...";
+        try {
+          const result = await fetch(
+            "https://www.googleapis.com/drive/v3/files/" +
+            VIDEO_ID + "?alt=media",
+            { headers: { Authorization: "Bearer " + response.access_token } }
+          );
+
+          if (!result.ok) throw new Error("Video tidak dapat diakses.");
+
+          const blob = await result.blob();
+          player.src = URL.createObjectURL(blob);
+          status.textContent = "Video siap diputar.";
+          await player.play();
+        } catch (error) {
+          status.textContent =
+            "Gagal memuat video. Periksa izin Drive dan konfigurasi API.";
+        }
+      }
+    });
+
+    document.getElementById("login").onclick = () => {
+      tokenClient.requestAccessToken();
+    };
+  </script>
 </body>
 </html>
